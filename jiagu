@@ -1,0 +1,50 @@
+#!/bin/bash
+  source /etc/profile
+ #cd `dirname $0`
+ #echo  `dirname $0`
+
+ #keystore文件路径
+ jks=${WORKSPACE}/haigui.jks
+
+ #打包输出的地址
+ apks=${WORKSPACE}/build/apks
+
+ #加固后的地址
+ #outs=${WORKSPACE}/build/outs
+ outs=/data/360jiagu/build/outs/${JOB_NAME}
+
+
+ rm -fr ${outs}/*
+
+ #加固包地址
+ jar_path='/data/360jiagu/jiagu/jiagu.jar'
+
+
+ echo "==========输出配置信息=========="
+ echo ${jks}
+ echo "打包输出地址："${apks}
+ echo "加固后包地址："${outs}
+ echo ${jar_path}
+
+ if [ ! -d ${outs}  ]; then
+       mkdir ${outs}
+ fi
+
+
+ #echo "签名"
+ #ls ${apks}
+
+
+
+ /usr/java/jdk1.8.0_25/bin/java -jar ${jar_path} -login 1200000 paswd  #加固账号密码
+
+ /usr/java/jdk1.8.0_25/bin/java -jar ${jar_path} -importsign ${jks} 111 111 zfc123  411156
+
+ /usr/java/jdk1.8.0_25/bin/java -jar ${jar_path} -config -x86 -crashlog
+
+ for file_a in ${apks}/*
+     do
+         temp_file=`basename $file_a`
+         echo ${temp_file}
+         /usr/java/jdk1.8.0_25/bin/java -jar ${jar_path} -jiagu $apks/$temp_file $outs -autosign -automulpkg
+     done
