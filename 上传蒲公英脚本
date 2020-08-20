@@ -1,0 +1,15 @@
+#/bin/bash
+currentTime=`date "+%Y-%m-%d %H:%M:%S"`
+curl --location --request POST 'https://www.pgyer.com/apiv2/app/upload' \
+--form "file=@${WORKSPACE}/app/build/outputs/apk/debug/app-debug.apk" \
+--form '_api_key=a2f9d12e3eaae51a435a665923377cec' \
+--form 'buildInstallType=2' \
+--form 'buildPassword=hixiaohe' \
+--form "buildUpdateDescription=${Description}+$currentTime" |jq '.data.buildQRCodeURL'  >url.txt
+echo "请打开下方链接扫码安装："
+result=`cat url.txt`
+echo $result
+
+
+sh send-ding.sh -a ccb0598d0c9d5781717b7b51d4ab3ac082486e24aea3fca4df4076e6b31940ca  -t result  -T "text" -c "发布包的地址$result" -A
+
